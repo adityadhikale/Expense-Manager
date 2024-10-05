@@ -21,5 +21,5 @@ Track your income, expenses, and manage your finances all in one place. Stay on 
 - **💾 PostgreSQL & Drizzle ORM:** Reliable and scalable data management.
 
 
-🌐 **Check out the live site here:** [Expense Manager]() 💻
+🌐 **Check out the live site here:** [Expense Manager](https://expense-manager-lite.netlify.app/) 💻
 
