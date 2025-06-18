@@ -1,20 +1,51 @@
 "use client"
 
 import { useUser } from "@clerk/nextjs"
+import { motion } from "framer-motion"
 
 export const WelcomeMsg = () => {
     const {user, isLoaded} = useUser();
 
+    // Don't render anything until user data is loaded
+    if (!isLoaded) return null;
+    
     return (
-        <div className="space-y-2 mb-4">
-            <h2 className="text-2xl lg:text-4xl text-white font-medium">
-                Welcome Back{isLoaded ? ", ": " "}{user?.firstName}💸
-                {/* Welcome Back💰 */}
-            </h2>
-            <p className="text-sm lg:text-base text-[#d4f2ec]">
-                This is your Expense Overview Report 
-            </p>
-        </div>
+        <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            className="space-y-3 mb-6"
+        >
+            <motion.h2 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="text-2xl lg:text-4xl text-white font-medium"
+            >
+                <span className="bg-gradient-to-r from-white to-white/90 bg-clip-text text-transparent">
+                    Welcome Back{user?.firstName ? `, ${user.firstName}` : ""}
+                </span>
+                <span className="inline-block animate-bounce-subtle ml-1">💸</span>
+            </motion.h2>
+            <motion.p 
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+                className="text-sm lg:text-base text-[#d4f2ec] font-medium tracking-wide"
+            >
+                <span className="bg-gradient-to-r from-[#d4f2ec] to-[#d4f2ec]/80 bg-clip-text text-transparent">
+                    This is your Expense Overview Report 
+                </span>
+                <span className="inline-block ml-1 opacity-80">📊</span>
+            </motion.p>
+            <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.6, duration: 0.5 }}
+                className="text-xs lg:text-sm text-[#d4f2ec]/70 font-medium"
+            >
+                Track your spending, monitor your savings, and achieve your financial goals.
+            </motion.div>
+        </motion.div>
     )
-
 };

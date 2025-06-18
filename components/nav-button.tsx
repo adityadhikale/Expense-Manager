@@ -9,9 +9,10 @@ type Props = {
     href: string;
     label: string;
     isActive: boolean;
+    icon: JSX.Element;
 };
 
-export const NavButton = ({ href, label, isActive }: Props) => {
+export const NavButton = ({ href, label, isActive, icon }: Props) => {
     return (
         <Button
             asChild
@@ -23,6 +24,7 @@ export const NavButton = ({ href, label, isActive }: Props) => {
             )}
         >
             <Link href={href} >
+                <span className="mr-2">{icon}</span>
                 {label}
             </Link>
         </Button>

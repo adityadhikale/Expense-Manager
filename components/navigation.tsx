@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Menu } from "lucide-react";
+import { Menu, Home, Wallet, CreditCard, Tags } from "lucide-react";
 import { useMedia } from "react-use";
 import { usePathname, useRouter } from "next/navigation";
 
@@ -29,7 +29,14 @@ const routes = [
 ];
 
 export const Navigation = () => {
-    const [isOpen, setIsOpen] = useState(false);
+const routeIcons: { [key: string]: JSX.Element } = {
+  "/": <Home className="h-4 w-4" />,
+  "/transactions": <Wallet className="h-4 w-4" />,
+  "/accounts": <CreditCard className="h-4 w-4" />,
+  "/categories": <Tags className="h-4 w-4" />,
+};
+
+const [isOpen, setIsOpen] = useState(false);
 
     const router = useRouter();
     const pathname = usePathname();
@@ -61,6 +68,7 @@ export const Navigation = () => {
                                 onClick={() => onClick(route.href)}
                                 className="w-full justify-start"
                             >
+                                <span className="mr-2">{routeIcons[route.href]}</span>
                                 {route.label}
                             </Button>
                         ))}
@@ -73,7 +81,7 @@ export const Navigation = () => {
     return (
         <nav className="hidden lg:flex items-center gap-x-2 overflow-auto" >
             {routes.map((route) => (
-                <NavButton key={route.href} href={route.href} label={route.label} isActive={pathname === route.href} />
+                <NavButton key={route.href} href={route.href} label={route.label} icon={routeIcons[route.href]} isActive={pathname === route.href} />
             ))}
         </nav>
     )
