@@ -1,5 +1,6 @@
 import { type IconType } from "react-icons";
 import { cva, type VariantProps } from "class-variance-authority";
+import { useEffect, useState } from "react";
 
 import {
   Card,
@@ -61,6 +62,17 @@ export const DataCard = ({
   variant,
   dateRange,
 }: DataCardProps) => {
+  // Track client-side mounting to prevent hydration mismatch
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Set mounted state after client-side hydration is complete
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
+  // Format the static value the same way CountUp would
+  const formattedValue = formatCurrency(value);
+  
   return (
     <Card className="border-none drop-shadow-sm">
       <CardHeader className="flex flex-row items-center justify-between gap-x-4">
@@ -79,14 +91,20 @@ export const DataCard = ({
 
       <CardContent>
         <h1 className="mb-2 line-clamp-1 break-all text-2xl font-bold">
-          <CountUp
-            preserveValue
-            start={0}
-            end={value}
-            decimals={2}
-            decimalPlaces={2}
-            formattingFn={formatCurrency}
-          />
+          {/* Show static value during SSR and initial render */}
+          {!isMounted ? (
+            formattedValue
+          ) : (
+            /* Only enable CountUp animation after client-side mounting */
+            <CountUp
+              preserveValue
+              start={0}
+              end={value}
+              decimals={2}
+              decimalPlaces={2}
+              formattingFn={formatCurrency}
+            />
+          )}
         </h1>
 
         <p

@@ -1,5 +1,5 @@
 import { FileSearch, Loader2, PieChart, Radar, Target } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -25,50 +25,70 @@ type SpendingPieProps = {
 export const SpendingPie = ({ data = [] }: SpendingPieProps) => {
   type ChartType = "pie" | "radar" | "radial";
   const [chartType, setChartType] = useState<ChartType>("pie");
+  // Track client-side mounting to prevent hydration mismatch
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Set mounted state after client-side hydration is complete
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const onTypeChange = (type: ChartType) => {
     setChartType(type);
   };
+  
   return (
     <Card className="border-none drop-shadow-sm">
       <CardHeader className="flex justify-between space-y-2 lg:flex-row lg:items-center lg:space-y-0">
         <CardTitle className="line-clamp-1 text-xl">Categories</CardTitle>
 
-        <Select defaultValue={chartType} onValueChange={onTypeChange}>
-          <SelectTrigger className="h-9 rounded-md px-3 lg:w-auto">
-            <SelectValue placeholder="Chart type" />
-          </SelectTrigger>
+        {/* Only render Select after client-side mounting */}
+        {isMounted ? (
+          <Select defaultValue={chartType} onValueChange={onTypeChange}>
+            <SelectTrigger className="h-9 rounded-md px-3 lg:w-auto">
+              <SelectValue placeholder="Chart type" />
+            </SelectTrigger>
 
-          <SelectContent>
-            <SelectItem value="pie">
-              <div className="flex items-center">
-                <PieChart className="mr-2 size-4 shrink-0" />
+            <SelectContent>
+              <SelectItem value="pie">
+                <div className="flex items-center">
+                  <PieChart className="mr-2 size-4 shrink-0" />
 
-                <p className="line-clamp-1">Pie chart</p>
-              </div>
-            </SelectItem>
+                  <p className="line-clamp-1">Pie chart</p>
+                </div>
+              </SelectItem>
 
-            <SelectItem value="radar">
-              <div className="flex items-center">
-                <Radar className="mr-2 size-4 shrink-0" />
+              <SelectItem value="radar">
+                <div className="flex items-center">
+                  <Radar className="mr-2 size-4 shrink-0" />
 
-                <p className="line-clamp-1">Radar chart</p>
-              </div>
-            </SelectItem>
+                  <p className="line-clamp-1">Radar chart</p>
+                </div>
+              </SelectItem>
 
-            <SelectItem value="radial">
-              <div className="flex items-center">
-                <Target className="mr-2 size-4 shrink-0" />
+              <SelectItem value="radial">
+                <div className="flex items-center">
+                  <Target className="mr-2 size-4 shrink-0" />
 
-                <p className="line-clamp-1">Radial chart</p>
-              </div>
-            </SelectItem>
-          </SelectContent>
-        </Select>
+                  <p className="line-clamp-1">Radial chart</p>
+                </div>
+              </SelectItem>
+            </SelectContent>
+          </Select>
+        ) : (
+          // Show a skeleton during SSR and initial render
+          <Skeleton className="h-9 w-[120px]" />
+        )}
       </CardHeader>
 
       <CardContent>
-        {data.length === 0 ? (
+        {!isMounted ? (
+          // Show loading state during SSR and initial client render
+          <div className="flex h-[350px] w-full items-center justify-center">
+            <Loader2 className="size-6 animate-spin text-slate-300" />
+          </div>
+        ) : data.length === 0 ? (
+          // No data state - only shown after mounting
           <div className="flex h-[350px] w-full flex-col items-center justify-center gap-y-4">
             <FileSearch className="size-6 text-muted-foreground" />
 
@@ -77,6 +97,7 @@ export const SpendingPie = ({ data = [] }: SpendingPieProps) => {
             </p>
           </div>
         ) : (
+          // Chart variants - only rendered after mounting
           <>
             {chartType === "pie" && <PieVariant data={data} />}
             {chartType === "radar" && <RadarVariant data={data} />}

@@ -5,7 +5,7 @@ import {
     LineChart,
     Loader2,
   } from "lucide-react";
-  import { useState } from "react";
+  import { useState, useEffect } from "react";
   
   import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
   import {
@@ -32,49 +32,70 @@ import {
   export const Chart = ({ data = [] }: ChartProps) => {
     type ChartType = "area" | "bar" | "line";
     const [chartType, setChartType] = useState<ChartType>("area");
+    // Track client-side mounting to prevent hydration mismatch
+    const [isMounted, setIsMounted] = useState(false);
   
+    // Set mounted state after client-side hydration is complete
+    useEffect(() => {
+      setIsMounted(true);
+    }, []);
+    
     const onTypeChange = (type: ChartType) => {
       setChartType(type);
     };
+    
     return (
       <Card className="border-none drop-shadow-sm">
         <CardHeader className="flex justify-between space-y-2 lg:flex-row lg:items-center lg:space-y-0">
           <CardTitle className="line-clamp-1 text-xl">Transactions</CardTitle>
-          <Select defaultValue={chartType} onValueChange={onTypeChange}>
-            <SelectTrigger className="h-9 rounded-md px-3 lg:w-auto">
-              <SelectValue placeholder="Chart type" />
-            </SelectTrigger>
-  
-            <SelectContent>
-              <SelectItem value="area">
-                <div className="flex items-center">
-                  <AreaChart className="mr-2 size-4 shrink-0" />
-  
-                  <p className="line-clamp-1">Area chart</p>
-                </div>
-              </SelectItem>
-  
-              <SelectItem value="line">
-                <div className="flex items-center">
-                  <LineChart className="mr-2 size-4 shrink-0" />
-  
-                  <p className="line-clamp-1">Line chart</p>
-                </div>
-              </SelectItem>
-  
-              <SelectItem value="bar">
-                <div className="flex items-center">
-                  <BarChart3 className="mr-2 size-4 shrink-0" />
-  
-                  <p className="line-clamp-1">Bar chart</p>
-                </div>
-              </SelectItem>
-            </SelectContent>
-          </Select>
+          
+          {/* Only render Select after client-side mounting */}
+          {isMounted ? (
+            <Select defaultValue={chartType} onValueChange={onTypeChange}>
+              <SelectTrigger className="h-9 rounded-md px-3 lg:w-auto">
+                <SelectValue placeholder="Chart type" />
+              </SelectTrigger>
+    
+              <SelectContent>
+                <SelectItem value="area">
+                  <div className="flex items-center">
+                    <AreaChart className="mr-2 size-4 shrink-0" />
+    
+                    <p className="line-clamp-1">Area chart</p>
+                  </div>
+                </SelectItem>
+    
+                <SelectItem value="line">
+                  <div className="flex items-center">
+                    <LineChart className="mr-2 size-4 shrink-0" />
+    
+                    <p className="line-clamp-1">Line chart</p>
+                  </div>
+                </SelectItem>
+    
+                <SelectItem value="bar">
+                  <div className="flex items-center">
+                    <BarChart3 className="mr-2 size-4 shrink-0" />
+    
+                    <p className="line-clamp-1">Bar chart</p>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          ) : (
+            // Show a skeleton during SSR and initial render
+            <Skeleton className="h-9 w-[120px]" />
+          )}
         </CardHeader>
   
         <CardContent>
-          {data.length === 0 ? (
+          {!isMounted ? (
+            // Show loading state during SSR and initial client render
+            <div className="flex h-[350px] w-full items-center justify-center">
+              <Loader2 className="size-6 animate-spin text-slate-300" />
+            </div>
+          ) : data.length === 0 ? (
+            // No data state - only shown after mounting
             <div className="flex h-[350px] w-full flex-col items-center justify-center gap-y-4">
               <FileSearch className="size-6 text-muted-foreground" />
               <p className="text-sm text-muted-foreground">
@@ -82,6 +103,7 @@ import {
               </p>
             </div>
           ) : (
+            // Chart variants - only rendered after mounting
             <>
               {chartType === "area" && <AreaVariant data={data} />}
               {chartType === "bar" && <BarVariant data={data} />}

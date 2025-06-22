@@ -28,11 +28,12 @@ import { useConfirm } from "@/hooks/use-confirm";
 import { Input } from "@/components/ui/input";
 
 interface DataTableProps<TData, TValue> {
+    id?: string;              // Add this line
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     filterKey: string;
     onDelete: (rows: Row<TData>[]) => void;
-    disabled?: boolean
+    disabled?: boolean;
 }
 
 

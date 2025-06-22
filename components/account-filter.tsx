@@ -2,6 +2,7 @@
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import qs from "query-string";
+import { useEffect, useState } from "react";
 
 import {
   Select,
@@ -12,19 +13,32 @@ import {
 } from "@/components/ui/select";
 import { useGetAccounts } from "@/features/accounts/api/use-get-accounts";
 import { useGetSummary } from "@/features/summary/api/use-get-summary";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const AccountFilter = () => {
+  // Track client-side mounting to prevent hydration mismatch
+  const [isMounted, setIsMounted] = useState(false);
+  
   const pathname = usePathname();
   const router = useRouter();
   const searchParams = useSearchParams();
-
+  
   const { isLoading: isLoadingSummary } = useGetSummary();
-
-  const accountId = searchParams.get("accountId") || "all";
-  const from = searchParams.get("from") || "";
-  const to = searchParams.get("to") || "";
-
+  
+  // Only access URL parameters after client-side mounting
+  const accountId = isMounted ? searchParams.get("accountId") || "all" : "all";
+  const from = isMounted ? searchParams.get("from") || "" : "";
+  const to = isMounted ? searchParams.get("to") || "" : "";
+  
+  // Set mounted state after client-side hydration is complete
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+  
   const onChange = (newValue: string) => {
+    // Only handle changes after mounting
+    if (!isMounted) return;
+    
     const query = {
       accountId: newValue,
       from,
@@ -45,6 +59,13 @@ export const AccountFilter = () => {
   };
 
   const { data: accounts, isLoading: isLoadingAccounts } = useGetAccounts();
+  // Show skeleton during SSR and initial client render
+  if (!isMounted) {
+    return (
+      <Skeleton className="h-9 w-32 lg:w-40 rounded-md bg-white/10" />
+    );
+  }
+  
   return (
     <Select
       value={accountId}

@@ -5,6 +5,8 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from "@/components/ui/sonner";
 import { SheetProvider } from "@/provider/sheet-provider";
 import { QueryProviders } from "@/provider/query-provider";
+import { TourProvider } from "@/provider/tour-provider";
+import { AuthLoading } from "@/components/auth-loading";
 
 import "./globals.css";
 
@@ -21,13 +23,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
+    <ClerkProvider 
+      appearance={{
+        layout: {
+          socialButtonsVariant: "iconButton",
+          socialButtonsPlacement: "bottom",
+        },
+        variables: {
+          colorPrimary: '#45ad93',
+        },
+      }}
+    >
       <html lang="en">
         <body className={inter.className}>
           <QueryProviders>
-            <SheetProvider/>
-            <Toaster/>
-            {children}
+            <AuthLoading>
+              <TourProvider>
+                <SheetProvider/>
+                <Toaster/>
+                {children}
+              </TourProvider>
+            </AuthLoading>
           </QueryProviders>
         </body>
       </html>

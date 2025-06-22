@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Mail, Heart, Home, Wallet, CreditCard, Tags } from "lucide-react";
+import { Github, Mail, Heart, Home, Wallet, CreditCard, Tags, PiggyBank } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -91,6 +91,17 @@ export function Footer() {
                     <Tags className="h-4 w-4" />
                   </span>
                   Categories
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  href="/budgets" 
+                  className="text-gray-300 hover:text-[#6cc1ab] transition-all duration-200 flex items-center group"
+                >
+                  <span className="bg-transparent group-hover:bg-[#6cc1ab]/10 rounded p-1.5 mr-2 transition-all duration-200">
+                    <PiggyBank className="h-4 w-4" />
+                  </span>
+                  Budgets
                 </Link>
               </li>
             </ul>

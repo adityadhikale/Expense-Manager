@@ -117,6 +117,7 @@ const TransactionsPage = () => {
 
           <div className="flex flex-col items-center gap-x-2 gap-y-2 lg:flex-row">
             <Button
+              id="add-transaction-btn"
               size="sm"
               onClick={newTransaction.onOpen}
               className="w-full lg:w-auto"
@@ -130,6 +131,7 @@ const TransactionsPage = () => {
 
         <CardContent>
           <DataTable
+            id="transaction-table"
             filterKey="payee"
             columns={columns}
             data={transactions}

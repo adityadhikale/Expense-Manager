@@ -2,6 +2,7 @@ import { relations } from "drizzle-orm";
 import { integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { sql } from "drizzle-orm";
 
 export const accounts = pgTable("accounts", {
   id: text("id").primaryKey(),
@@ -57,3 +58,33 @@ export const transactionsRelations = relations(transactions, ({ one }) => ({
 export const insertTransactionSchema = createInsertSchema(transactions, {
   date: z.coerce.date(),
 });
+
+export const budgets = pgTable("budgets", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  amount: integer("amount").notNull(),
+  month: timestamp("month", { mode: "date" }).notNull(),
+  userId: text("user_id").notNull(),
+  categoryId: text("category_id").references(() => categories.id, {
+    onDelete: "set null",
+  }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const budgetsRelations = relations(budgets, ({ one }) => ({
+  category: one(categories, {
+    fields: [budgets.categoryId],
+    references: [categories.id],
+  }),
+}));
+
+export const insertBudgetSchema = createInsertSchema(budgets, {
+  month: z.coerce.date(),
+});
+
+// Update category relations to include budgets (after budgets table is defined)
+export const categoriesRelationsWithBudgets = relations(categories, ({ many }) => ({
+  transactions: many(transactions),
+  budgets: many(budgets),
+}));

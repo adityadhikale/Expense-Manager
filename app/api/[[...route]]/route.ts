@@ -10,15 +10,23 @@ export const runtime = 'edge';
 
 const app = new Hono().basePath('/api');
 
+// Import budget routes
+import budgets from "./budgets";
+import budgetsProgress from "./budgets-progress";
+
+// Register all routes with the app
 const routes = app
     .route("/summary", summary)
     .route("/accounts", accounts)
     .route("/categories", categories)
-    .route("/transactions", transactions);
+    .route("/transactions", transactions)
+    .route("/budgets", budgets)
+    .route("/budgets/progress", budgetsProgress); // Register the progress route directly
 
-export const GET = handle(app);
-export const POST = handle(app);
-export const PATCH = handle(app);
-export const DELETE = handle(app);
+// Use routes for the handlers
+export const GET = handle(routes);
+export const POST = handle(routes);
+export const PATCH = handle(routes);
+export const DELETE = handle(routes);
 
 export type AppType = typeof routes;

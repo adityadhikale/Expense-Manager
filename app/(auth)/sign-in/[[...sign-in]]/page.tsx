@@ -1,6 +1,5 @@
 import Image from "next/image";
-import { Loader2 } from "lucide-react";
-import { SignIn, ClerkLoaded, ClerkLoading } from "@clerk/nextjs";
+import { AuthWrapper } from "@/components/auth-wrapper";
 
 export default function Page() {
     return (
@@ -15,12 +14,7 @@ export default function Page() {
                     </p>
                 </div>
                 <div className="flex items-center justify-center mt-8">
-                    <ClerkLoaded>
-                        <SignIn path="/sign-in" />
-                    </ClerkLoaded>
-                    <ClerkLoading>
-                        <Loader2 className="animate-spin text-muted-foreground" />
-                    </ClerkLoading>
+                    <AuthWrapper type="sign-in" />
                 </div>
             </div>
             <div className="h-full bg-[#45ad93] hidden lg:flex items-center justify-center">
