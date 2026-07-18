@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Github, Mail, Heart, Home, Wallet, CreditCard, Tags, PiggyBank } from "lucide-react";
+import { Heart, Home, Wallet, CreditCard, Tags, PiggyBank } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -29,9 +29,9 @@ export function Footer() {
     <footer className="w-full bg-[#333333] text-white mt-auto">
       <div className="container mx-auto px-4">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 py-8">
+        <div className="flex flex-col md:flex-row md:items-start gap-8 md:gap-16 py-8">
           {/* Brand Section */}
-          <div className="space-y-4">
+          <div className="space-y-4 max-w-sm">
             <div className="flex items-center gap-2">
               <div className="bg-[#6cc1ab] rounded-lg p-2">
                 <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -107,28 +107,6 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Contact Section */}
-          <div>
-            <h3 className="text-lg font-semibold mb-4">Connect</h3>
-            <div className="flex space-x-4">
-              <Link
-                href="https://github.com/adityadhikale/Expense-Manager"
-                target="_blank"
-                rel="noreferrer"
-                className="text-gray-300 hover:text-[#6cc1ab] transition-colors"
-              >
-                <Github className="h-6 w-6" />
-                <span className="sr-only">GitHub</span>
-              </Link>
-              <Link
-                href="mailto:adityadhikale2003@gmail.com"
-                className="text-gray-300 hover:text-[#6cc1ab] transition-colors"
-              >
-                <Mail className="h-6 w-6" />
-                <span className="sr-only">Email</span>
-              </Link>
-            </div>
-          </div>
         </div>
 
         {/* Bottom Bar */}

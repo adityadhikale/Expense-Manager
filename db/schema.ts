@@ -88,3 +88,13 @@ export const categoriesRelationsWithBudgets = relations(categories, ({ many }) =
   transactions: many(transactions),
   budgets: many(budgets),
 }));
+
+export const appPreferences = pgTable("app_preferences", {
+  id: text("id").primaryKey(),
+  userId: text("user_id").notNull().unique(),
+  currency: text("currency").notNull().default("INR"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+export const insertAppPreferencesSchema = createInsertSchema(appPreferences);

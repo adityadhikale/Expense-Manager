@@ -30,7 +30,7 @@ const app = new Hono()
       }
 
       const defaultTo = new Date();
-      const defaultFrom = subDays(defaultTo, 30);
+      const defaultFrom = subDays(defaultTo, 60);
 
       const startDate = from
         ? parse(from, "yyyy-MM-dd", new Date())
@@ -72,6 +72,32 @@ const app = new Hono()
           );
       };
 
+      async function fetchBalanceAsOf(
+        userId: string,
+        asOfDate: Date,
+      ) {
+        const [result] = await db
+          .select({
+            balance: sum(transactions.amount).mapWith(Number),
+          })
+          .from(transactions)
+          .innerJoin(
+            accounts,
+            eq(
+              transactions.accountId,
+              accounts.id,
+            ),
+          )
+          .where(
+            and(
+              accountId ? eq(transactions.accountId, accountId) : undefined,
+              eq(accounts.userId, userId),
+              lte(transactions.date, asOfDate),
+            )
+          );
+        return result?.balance ?? 0;
+      };
+
       const [currentPeriod] = await fetchFinancialData(
         auth.userId,
         startDate,
@@ -80,13 +106,16 @@ const app = new Hono()
 
       const [lastPeriod] = await fetchFinancialData(
         auth.userId,
-        startDate,
-        endDate,
+        lastPeriodStart,
+        lastPeriodEnd,
       );
+
+      const currentBalance = await fetchBalanceAsOf(auth.userId, endDate);
+      const previousBalance = await fetchBalanceAsOf(auth.userId, lastPeriodEnd);
 
       const incomeChange = calculatePercentageChange(currentPeriod.income, lastPeriod.income);
       const expensesChange = calculatePercentageChange(currentPeriod.expenses, lastPeriod.expenses);
-      const remainingChange = calculatePercentageChange(currentPeriod.remaining, lastPeriod.remaining);
+      const remainingChange = calculatePercentageChange(currentBalance, previousBalance);
 
       const category = await db
         .select({
@@ -169,7 +198,7 @@ const app = new Hono()
 
       return c.json({
         data: {
-          remainingAmount: currentPeriod.remaining,
+          remainingAmount: currentBalance,
           remainingChange,
           incomeAount: currentPeriod.income,
           incomeChange,

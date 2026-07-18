@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 
 import { useGetSummary } from "@/features/summary/api/use-get-summary";
 import { formatDateRange } from "@/lib/utils";
+import { format } from "date-fns";
 
 import { DataCard, DataCardLoading } from "@/components/data-card";
 
@@ -20,6 +21,7 @@ export const DataGrid = () => {
   const from = isMounted ? searchParams.get("from") || undefined : undefined;
   
   const dateRangeLabel = formatDateRange({ to, from });
+  const balanceAsOfLabel = `As of ${format(to ? new Date(to) : new Date(), "LLL dd, y")}`;
   
   // Set isMounted to true after component mounts on client
   useEffect(() => {
@@ -43,12 +45,12 @@ export const DataGrid = () => {
     <>
       <div id="dashboard-metrics-grid" className="mb-8 grid grid-cols-1 gap-8 pb-2 lg:grid-cols-3">
         <DataCard
-          title="Remaining"
+          title="Current Balance"
           value={data?.remainingAmount}
           percentageChange={data?.remainingChange}
           icon={FaPiggyBank}
           variant="default"
-          dateRange={dateRangeLabel}
+          dateRange={balanceAsOfLabel}
         />
 
         <DataCard

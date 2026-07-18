@@ -29,7 +29,7 @@ export const DateFilter = () => {
   // Memoize default dates to prevent recreation on every render
   const defaultDates = useMemo(() => {
     const defaultTo = new Date();
-    const defaultFrom = subDays(defaultTo, 30);
+    const defaultFrom = subDays(defaultTo, 60);
     
     return {
       defaultTo,

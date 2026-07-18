@@ -5,7 +5,6 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { Toaster } from "@/components/ui/sonner";
 import { SheetProvider } from "@/provider/sheet-provider";
 import { QueryProviders } from "@/provider/query-provider";
-import { TourProvider } from "@/provider/tour-provider";
 import { AuthLoading } from "@/components/auth-loading";
 
 import "./globals.css";
@@ -38,11 +37,9 @@ export default function RootLayout({
         <body className={inter.className}>
           <QueryProviders>
             <AuthLoading>
-              <TourProvider>
-                <SheetProvider/>
-                <Toaster/>
-                {children}
-              </TourProvider>
+              <SheetProvider/>
+              <Toaster/>
+              {children}
             </AuthLoading>
           </QueryProviders>
         </body>
