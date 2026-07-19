@@ -14,12 +14,13 @@ import { useGetAppPreferences } from "@/features/app-preferences/api/use-get-app
   };
   
   export const CategoryTooltip = ({ active, payload }: CategoryTooltipProps) => {
-    if (!active || !payload) return null;
-  
-    const name = payload[0].payload.name;
-    const value = payload[0].value as number;
   const { data: preferences } = useGetAppPreferences();
   const currency = preferences?.currency ?? "INR";
+
+  if (!active || !payload) return null;
+
+  const name = payload[0].payload.name;
+  const value = payload[0].value as number;
   
     return (
       <div className="overflow-hidden rounded-sm border bg-white shadow-sm">

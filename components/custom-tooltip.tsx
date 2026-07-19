@@ -15,13 +15,14 @@ type CustomTooltipProps = {
 };
 
 export const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
+  const { data: preferences } = useGetAppPreferences();
+  const currency = preferences?.currency ?? "INR";
+
   if (!active || !payload) return null;
 
   const date = payload[0].payload.date as Date;
   const income = payload[0].value as number;
   const expenses = payload[1].value as number;
-  const { data: preferences } = useGetAppPreferences();
-  const currency = preferences?.currency ?? "INR";
 
   return (
     <div className="overflow-hidden rounded-sm border bg-white shadow-sm">
