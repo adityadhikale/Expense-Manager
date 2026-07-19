@@ -129,6 +129,31 @@ const app = new Hono()
       console.log(`Converting budget amount: ${values.amount} → ${amountInMilliunits} milliunits`);
 
       try {
+        if (values.categoryId) {
+          const monthDate = new Date(values.month);
+          const startOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+          const endOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+
+          const [existing] = await db
+            .select({ id: budgets.id })
+            .from(budgets)
+            .where(
+              and(
+                eq(budgets.userId, auth.userId),
+                eq(budgets.categoryId, values.categoryId),
+                gte(budgets.month, startOfMonth),
+                lte(budgets.month, endOfMonth)
+              )
+            );
+
+          if (existing) {
+            return ctx.json(
+              { error: "A budget for this category already exists for this month." },
+              409
+            );
+          }
+        }
+
         const [data] = await db
           .insert(budgets)
           .values({
@@ -211,6 +236,31 @@ const app = new Hono()
       console.log(`Updating budget amount: ${values.amount} → ${amountInMilliunits} milliunits`);
 
       try {
+        if (values.categoryId) {
+          const monthDate = new Date(values.month);
+          const startOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1);
+          const endOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth() + 1, 0);
+
+          const [existing] = await db
+            .select({ id: budgets.id })
+            .from(budgets)
+            .where(
+              and(
+                eq(budgets.userId, auth.userId),
+                eq(budgets.categoryId, values.categoryId),
+                gte(budgets.month, startOfMonth),
+                lte(budgets.month, endOfMonth)
+              )
+            );
+
+          if (existing && existing.id !== id) {
+            return ctx.json(
+              { error: "A budget for this category already exists for this month." },
+              409
+            );
+          }
+        }
+
         const [data] = await db
           .update(budgets)
           .set({

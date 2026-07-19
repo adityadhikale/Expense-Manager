@@ -6,6 +6,7 @@ import type {
   
   import { Separator } from "@/components/ui/separator";
   import { formatCurrency } from "@/lib/utils";
+import { useGetAppPreferences } from "@/features/app-preferences/api/use-get-app-preferences";
   
   type CategoryTooltipProps = {
     active: boolean | undefined;
@@ -17,6 +18,8 @@ import type {
   
     const name = payload[0].payload.name;
     const value = payload[0].value as number;
+  const { data: preferences } = useGetAppPreferences();
+  const currency = preferences?.currency ?? "INR";
   
     return (
       <div className="overflow-hidden rounded-sm border bg-white shadow-sm">
@@ -35,7 +38,7 @@ import type {
             </div>
   
             <p className="text-right text-sm font-medium">
-              {formatCurrency(value * -1)}
+              {formatCurrency(value * -1, currency)}
             </p>
           </div>
         </div>

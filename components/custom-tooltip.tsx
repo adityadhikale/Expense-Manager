@@ -7,6 +7,7 @@ import type {
 
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/lib/utils";
+import { useGetAppPreferences } from "@/features/app-preferences/api/use-get-app-preferences";
 
 type CustomTooltipProps = {
   active: boolean | undefined;
@@ -19,6 +20,8 @@ export const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
   const date = payload[0].payload.date as Date;
   const income = payload[0].value as number;
   const expenses = payload[1].value as number;
+  const { data: preferences } = useGetAppPreferences();
+  const currency = preferences?.currency ?? "INR";
 
   return (
     <div className="overflow-hidden rounded-sm border bg-white shadow-sm">
@@ -37,7 +40,7 @@ export const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
           </div>
 
           <p className="text-right text-sm font-medium">
-            {formatCurrency(income)}
+            {formatCurrency(income, currency)}
           </p>
         </div>
 
@@ -49,7 +52,7 @@ export const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
           </div>
 
           <p className="text-right text-sm font-medium">
-            {formatCurrency(expenses * -1)}
+            {formatCurrency(expenses * -1, currency)}
           </p>
         </div>
       </div>

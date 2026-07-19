@@ -21,7 +21,14 @@ export const useUpdateBudget = (id?: string) => {
         json,
         param: { id },
       });
-      return await response.json();
+      const result = await response.json();
+
+      if (!response.ok) {
+        const message = "error" in result ? result.error : "Failed to update budget";
+        throw new Error(message);
+      }
+
+      return result;
     },
     onSuccess: () => {
       toast.success("Budget updated");
@@ -30,8 +37,8 @@ export const useUpdateBudget = (id?: string) => {
       queryClient.invalidateQueries({ queryKey: ["budgets/progress"] });
       queryClient.invalidateQueries({ queryKey: ["summary"] });
     },
-    onError: () => {
-      toast.error("Failed to update budget!");
+    onError: (error) => {
+      toast.error(error.message || "Failed to update budget!");
     },
   });
 

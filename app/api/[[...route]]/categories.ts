@@ -6,7 +6,7 @@ import { Hono } from "hono";
 import { z } from "zod";
 
 import { db } from "@/db/drizzle";
-import { categories, insertCategorySchema } from "@/db/schema";
+import { categories, insertCategorySchema, budgets } from "@/db/schema";
 
 const app = new Hono()
   .get("/", clerkMiddleware(), async (ctx) => {
@@ -108,6 +108,25 @@ const app = new Hono()
         return ctx.json({ error: "Unauthorized." }, 401);
       }
 
+      const budgetsUsingCategories = await db
+        .select({ categoryId: budgets.categoryId })
+        .from(budgets)
+        .where(
+          and(
+            eq(budgets.userId, auth.userId),
+            inArray(budgets.categoryId, values.ids)
+          )
+        );
+
+      if (budgetsUsingCategories.length > 0) {
+        return ctx.json(
+          {
+            error: `${budgetsUsingCategories.length} of the selected categories are used by a budget. Remove or reassign those budgets first.`,
+          },
+          409
+        );
+      }
+
       const data = await db
         .delete(categories)
         .where(
@@ -183,6 +202,20 @@ const app = new Hono()
 
       if (!auth?.userId) {
         return ctx.json({ error: "Unauthorized." }, 401);
+      }
+
+      const budgetsUsingCategory = await db
+        .select({ id: budgets.id })
+        .from(budgets)
+        .where(and(eq(budgets.userId, auth.userId), eq(budgets.categoryId, id)));
+
+      if (budgetsUsingCategory.length > 0) {
+        return ctx.json(
+          {
+            error: `This category is used by ${budgetsUsingCategory.length} budget${budgetsUsingCategory.length > 1 ? "s" : ""}. Remove or reassign ${budgetsUsingCategory.length > 1 ? "them" : "it"} first.`,
+          },
+          409
+        );
       }
 
       const [data] = await db

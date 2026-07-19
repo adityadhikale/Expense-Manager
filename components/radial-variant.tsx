@@ -6,6 +6,7 @@ import {
   } from "recharts";
   
   import { formatCurrency } from "@/lib/utils";
+import { useGetAppPreferences } from "@/features/app-preferences/api/use-get-app-preferences";
   
   const COLORS = ["#0062FF", "#12C6FF", "#FF647F", "#FF9354"];
   
@@ -17,6 +18,8 @@ import {
   };
   
   export const RadialVariant = ({ data }: RadialVariantProps) => {
+  const { data: preferences } = useGetAppPreferences();
+  const currency = preferences?.currency ?? "INR";
     return (
       <ResponsiveContainer width="100%" height={350}>
         <RadialBarChart
@@ -67,7 +70,7 @@ import {
                         </span>
   
                         <span className="text-sm">
-                          {formatCurrency(entry.payload?.value)}
+                          {formatCurrency(entry.payload?.value, currency)}
                         </span>
                       </div>
                     </li>

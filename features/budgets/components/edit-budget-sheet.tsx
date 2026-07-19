@@ -6,6 +6,7 @@ import { useGetBudget } from "@/features/budgets/api/use-get-budget";
 import { useUpdateBudget } from "@/features/budgets/api/use-update-budget";
 import { useDeleteBudget } from "@/features/budgets/api/use-delete-budget";
 import { useGetCategories } from "@/features/categories/api/use-get-categories";
+import { useCreateCategory } from "@/features/categories/api/use-create-category";
 import { useConfirm } from "@/hooks/use-confirm";
 import { convertAmountFromMilliunits } from "@/lib/utils";
 
@@ -23,6 +24,7 @@ export const EditBudgetSheet = () => {
   const updateBudget = useUpdateBudget(id);
   const deleteBudget = useDeleteBudget(id);
   const categoriesQuery = useGetCategories();
+  const categoryMutation = useCreateCategory();
 
   const categories = categoriesQuery.data || [];
   
@@ -31,14 +33,16 @@ export const EditBudgetSheet = () => {
     value: category.id,
   }));
 
-  const isPending = updateBudget.isPending || deleteBudget.isPending;
+  const onCreateCategory = (name: string) => categoryMutation.mutate({ name });
+
+  const isPending = updateBudget.isPending || deleteBudget.isPending || categoryMutation.isPending;
   const isLoading = budgetQuery.isLoading || categoriesQuery.isLoading;
 
   const onSubmit = (values: {
     name: string;
     amount: number;
     month: Date;
-    categoryId?: string | null;
+    categoryId: string;
   }) => {
     updateBudget.mutate(values, {
       onSuccess: () => {
@@ -63,13 +67,13 @@ export const EditBudgetSheet = () => {
         name: budgetQuery.data.name,
         amount: convertAmountFromMilliunits(budgetQuery.data.amount).toString(),
         month: new Date(budgetQuery.data.month),
-        categoryId: budgetQuery.data.categoryId,
+        categoryId: budgetQuery.data.categoryId || "",
       }
     : {
         name: "",
         amount: "0",
         month: new Date(),
-        categoryId: null,
+        categoryId: "",
       };
 
   return (
@@ -95,6 +99,7 @@ export const EditBudgetSheet = () => {
               disabled={isPending}
               defaultValues={defaultValues}
               categoryOptions={categoryOptions}
+              onCreateCategory={onCreateCategory}
             />
           )}
         </SheetContent>

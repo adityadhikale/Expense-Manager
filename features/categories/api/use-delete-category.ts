@@ -17,7 +17,14 @@ export const useDeleteCategory = (id? : string) => {
             const response = await client.api.categories[":id"]["$delete"]({
             param: {id},
             });
-            return await response.json();
+            const result = await response.json();
+
+            if (!response.ok) {
+                const message = "error" in result ? result.error : "Failed to delete category";
+                throw new Error(message);
+            }
+
+            return result;
         },
         onSuccess: () => {
             toast.success("Category deleted");
@@ -25,9 +32,11 @@ export const useDeleteCategory = (id? : string) => {
             queryClient.invalidateQueries({queryKey: ["categories"]});
             queryClient.invalidateQueries({queryKey: ["transactions"]});
             queryClient.invalidateQueries({queryKey: ["summary"]});
+            queryClient.invalidateQueries({queryKey: ["budgets"]});
+            queryClient.invalidateQueries({queryKey: ["budgets/progress"]});
         },
-        onError: () => {
-            toast.error("Failed to delete category!");
+        onError: (error) => {
+            toast.error(error.message || "Failed to delete category!");
         }
     });
 

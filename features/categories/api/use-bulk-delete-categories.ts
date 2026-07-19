@@ -17,15 +17,24 @@ export const useBulkDeleteCategories = () => {
     >({
         mutationFn: async (json) => {
             const response = await client.api.categories["bulk-delete"]["$post"]({json});
-            return await response.json();
+            const result = await response.json();
+
+            if (!response.ok) {
+                const message = "error" in result ? result.error : "Failed to delete categories";
+                throw new Error(message);
+            }
+
+            return result;
         },
         onSuccess: () => {
             toast.success("Categories Deleted");
             queryClient.invalidateQueries({queryKey: ["categories"]});
             queryClient.invalidateQueries({queryKey: ["summary"]});
+            queryClient.invalidateQueries({queryKey: ["budgets"]});
+            queryClient.invalidateQueries({queryKey: ["budgets/progress"]});
         },
-        onError: () => {
-            toast.error("Failed to delete categories!");
+        onError: (error) => {
+            toast.error(error.message || "Failed to delete categories!");
         }
     });
 

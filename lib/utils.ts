@@ -40,10 +40,20 @@ export function convertAmountToMilliunits(amount: number | string): number {
   return Math.round(numericAmount * 100);
 }
 
-export function formatCurrency(value: number) {
-  return Intl.NumberFormat('en-IN', {
+const CURRENCY_LOCALES: Record<string, string> = {
+  INR: 'en-IN',
+  USD: 'en-US',
+  EUR: 'de-DE',
+  GBP: 'en-GB',
+  AED: 'ar-AE',
+};
+
+export function formatCurrency(value: number, currency: string = 'INR') {
+  const locale = CURRENCY_LOCALES[currency] ?? 'en-IN';
+
+  return Intl.NumberFormat(locale, {
     style: 'currency',
-    currency: 'INR',
+    currency,
     minimumFractionDigits: 2,
   }).format(value);
 }

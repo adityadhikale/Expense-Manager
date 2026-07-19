@@ -13,6 +13,7 @@ const app = new Hono().basePath('/api');
 // Import budget routes
 import budgets from "./budgets";
 import budgetsProgress from "./budgets-progress";
+import appPreferences from "./app-preferences";
 
 // Register all routes with the app
 const routes = app
@@ -21,7 +22,8 @@ const routes = app
     .route("/categories", categories)
     .route("/transactions", transactions)
     .route("/budgets", budgets)
-    .route("/budgets/progress", budgetsProgress); // Register the progress route directly
+    .route("/budgets/progress", budgetsProgress) // Register the progress route directly
+    .route("/app-preferences", appPreferences);
 
 // Use routes for the handlers
 export const GET = handle(routes);

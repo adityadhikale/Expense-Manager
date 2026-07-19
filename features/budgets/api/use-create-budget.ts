@@ -18,7 +18,14 @@ export const useCreateBudget = () => {
   const mutation = useMutation<ResponseType, Error, RequestType>({
     mutationFn: async (json) => {
       const response = await client.api.budgets.$post({ json });
-      return await response.json();
+      const result = await response.json();
+
+      if (!response.ok) {
+        const message = "error" in result ? result.error : "Failed to create budget";
+        throw new Error(message);
+      }
+
+      return result;
     },
     onSuccess: () => {
       toast.success("Budget created");
@@ -26,8 +33,8 @@ export const useCreateBudget = () => {
       queryClient.invalidateQueries({ queryKey: ["budgets/progress"] });
       queryClient.invalidateQueries({ queryKey: ["summary"] });
     },
-    onError: () => {
-      toast.error("Failed to create budget!");
+    onError: (error) => {
+      toast.error(error.message || "Failed to create budget!");
     },
   });
 

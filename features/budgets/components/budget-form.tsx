@@ -46,7 +46,7 @@ const formSchema = z.object({
       { message: "Amount cannot exceed 1,000,000" }
     ),
   month: z.date(),
-  categoryId: z.string().nullable().optional(),
+  categoryId: z.string().min(1, "Category is required"),
 });
 
 // API schema type
@@ -55,7 +55,7 @@ type ApiFormValues = {
   name: string;
   amount: number;
   month: Date;
-  categoryId?: string | null;
+  categoryId: string;
 };
 
 type Props = {
@@ -89,7 +89,7 @@ export const BudgetForm = ({
       name: defaultValues?.name || "",
       amount: initialAmount,
       month: defaultValues?.month || new Date(),
-      categoryId: defaultValues?.categoryId || null,
+      categoryId: defaultValues?.categoryId || "",
     },
   });
 
@@ -176,6 +176,7 @@ export const BudgetForm = ({
                   {...field}
                   disabled={disabled}
                   placeholder="Enter amount"
+                  hideToggle
                   onValueChange={(val) => {
                     field.onChange(val);
                   }}
@@ -209,7 +210,7 @@ export const BudgetForm = ({
           control={form.control}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category (Optional)</FormLabel>
+              <FormLabel>Category</FormLabel>
               <FormControl>
                 <Select
                   placeholder="Select a category"

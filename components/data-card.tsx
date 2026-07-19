@@ -13,6 +13,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatCurrency, formatPercentage } from "@/lib/utils";
 
 import { CountUp } from "@/components/count-up";
+import { useGetAppPreferences } from "@/features/app-preferences/api/use-get-app-preferences";
 
 const boxVariant = cva("shrink-0 rounded-md p-3", {
   variants: {
@@ -64,6 +65,8 @@ export const DataCard = ({
 }: DataCardProps) => {
   // Track client-side mounting to prevent hydration mismatch
   const [isMounted, setIsMounted] = useState(false);
+  const { data: preferences } = useGetAppPreferences();
+  const currency = preferences?.currency ?? "INR";
   
   // Set mounted state after client-side hydration is complete
   useEffect(() => {
@@ -71,7 +74,7 @@ export const DataCard = ({
   }, []);
   
   // Format the static value the same way CountUp would
-  const formattedValue = formatCurrency(value);
+  const formattedValue = formatCurrency(value, currency);
   
   return (
     <Card className="border-none drop-shadow-sm">
@@ -102,7 +105,7 @@ export const DataCard = ({
               end={value}
               decimals={2}
               decimalPlaces={2}
-              formattingFn={formatCurrency}
+              formattingFn={(val) => formatCurrency(val, currency)}
             />
           )}
         </h1>

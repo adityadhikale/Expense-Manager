@@ -1,6 +1,7 @@
 import { useNewBudget } from "@/features/budgets/hooks/use-new-budget";
 import { BudgetForm } from "@/features/budgets/components/budget-form";
 import { useCreateBudget } from "@/features/budgets/api/use-create-budget";
+import { useCreateCategory } from "@/features/categories/api/use-create-category";
 import { useGetCategories } from "@/features/categories/api/use-get-categories";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
@@ -8,6 +9,7 @@ export const NewBudgetSheet = () => {
   const { isOpen, onClose } = useNewBudget();
   const createBudget = useCreateBudget();
   const categoriesQuery = useGetCategories();
+  const categoryMutation = useCreateCategory();
 
   const categories = categoriesQuery.data || [];
   
@@ -16,11 +18,13 @@ export const NewBudgetSheet = () => {
     value: category.id,
   }));
 
+  const onCreateCategory = (name: string) => categoryMutation.mutate({ name });
+
   const onSubmit = (values: {
     name: string;
     amount: number;
     month: Date;
-    categoryId?: string | null;
+    categoryId: string;
   }) => {
     createBudget.mutate(values, {
       onSuccess: () => {
@@ -40,13 +44,14 @@ export const NewBudgetSheet = () => {
         </SheetHeader>
         <BudgetForm
           onSubmit={onSubmit}
-          disabled={createBudget.isPending || categoriesQuery.isLoading}
+          disabled={createBudget.isPending || categoriesQuery.isLoading || categoryMutation.isPending}
           categoryOptions={categoryOptions}
+          onCreateCategory={onCreateCategory}
           defaultValues={{
             name: "",
             amount: "0",
             month: new Date(),
-            categoryId: null,
+            categoryId: "",
           }}
         />
       </SheetContent>

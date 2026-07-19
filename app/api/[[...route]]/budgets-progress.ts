@@ -1,11 +1,11 @@
 import { clerkMiddleware, getAuth } from "@hono/clerk-auth";
 import { zValidator } from "@hono/zod-validator";
-import { and, eq, gte, lte, sum, sql } from "drizzle-orm";
+import { and, eq, gte, lte, sum, sql, isNull } from "drizzle-orm";
 import { Hono } from "hono";
 import { z } from "zod";
 
 import { db } from "@/db/drizzle";
-import { budgets, transactions, categories } from "@/db/schema";
+import { budgets, transactions, categories, accounts } from "@/db/schema";
 
 // Define response types for better type safety
 export type BudgetProgressItem = {
@@ -120,8 +120,10 @@ const budgetsProgress = new Hono()
               const result = await db
                 .select({ total: sum(transactions.amount) })
                 .from(transactions)
+                .innerJoin(accounts, eq(transactions.accountId, accounts.id))
                 .where(
                   and(
+                    eq(accounts.userId, auth.userId),
                     eq(transactions.categoryId, budget.categoryId),
                     gte(transactions.date, startOfMonth),
                     lte(transactions.date, endOfMonth),
@@ -133,12 +135,15 @@ const budgetsProgress = new Hono()
               // Convert negative amount to positive for expense total
               spent = result[0]?.total ? Math.abs(Number(result[0].total)) : 0;
             } else {
-              // For overall budget with no category, get all expenses
+              // For a budget with no category, only count genuinely uncategorized expenses
               const result = await db
                 .select({ total: sum(transactions.amount) })
                 .from(transactions)
+                .innerJoin(accounts, eq(transactions.accountId, accounts.id))
                 .where(
                   and(
+                    eq(accounts.userId, auth.userId),
+                    isNull(transactions.categoryId),
                     gte(transactions.date, startOfMonth),
                     lte(transactions.date, endOfMonth),
                     // Only count expenses (negative amounts)

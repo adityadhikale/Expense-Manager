@@ -20,10 +20,13 @@ import { CircularProgress } from "@/components/ui/circular-progress";
 import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
+import { useGetAppPreferences } from "@/features/app-preferences/api/use-get-app-preferences";
 
 export const BudgetProgressCard = () => {
   const [isMounted, setIsMounted] = useState(false);
   const { data, isLoading, error } = useGetBudgetProgress();
+  const { data: preferences } = useGetAppPreferences();
+  const currency = preferences?.currency ?? "INR";
   const router = useRouter();
   const newBudget = useNewBudget();
 
@@ -132,7 +135,7 @@ export const BudgetProgressCard = () => {
             <div className="mt-4 text-center">
               <p className="text-sm font-medium">Overall Budget</p>
               <p className="text-xs text-muted-foreground">
-                {formatCurrency(summary.totalSpent)} of {formatCurrency(summary.totalBudget)}
+                {formatCurrency(summary.totalSpent, currency)} of {formatCurrency(summary.totalBudget, currency)}
               </p>
             </div>
           </div>
@@ -144,7 +147,7 @@ export const BudgetProgressCard = () => {
                 <div className="flex justify-between text-sm">
                   <span className="font-medium">{budget.name}</span>
                   <span className="text-xs text-muted-foreground">
-                    {formatCurrency(budget.spent)} of {formatCurrency(budget.budgetAmount)}
+                    {formatCurrency(budget.spent, currency)} of {formatCurrency(budget.budgetAmount, currency)}
                   </span>
                 </div>
                 <Progress
